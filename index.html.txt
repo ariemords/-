@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תולו - ספריית חפצים</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+text-align:center;
+}
+
+header{
+background:#2c3e50;
+color:white;
+padding:20px;
+}
+
+section{
+margin:20px;
+}
+
+input,textarea,button{
+display:block;
+margin:10px auto;
+padding:8px;
+width:90%;
+max-width:400px;
+}
+
+button{
+background:#2980b9;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+button:hover{
+background:#1f6691;
+}
+
+.card{
+background:white;
+padding:15px;
+margin:10px auto;
+width:90%;
+max-width:400px;
+border-radius:8px;
+}
+</style>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "כאן_תדביק",
+authDomain: "כאן",
+projectId: "כאן",
+storageBucket: "כאן",
+messagingSenderId: "כאן",
+appId: "כאן"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user)=>{
+currentUser = user;
+if(user){
+loadItems();
+}
+});
+
+window.register = async function(){
+const email=document.getElementById("email").value;
+const pass=document.getElementById("password").value;
+await createUserWithEmailAndPassword(auth,email,pass);
+alert("נרשמת בהצלחה");
+}
+
+window.login = async function(){
+const email=document.getElementById("email").value;
+const pass=document.getElementById("password").value;
+await signInWithEmailAndPassword(auth,email,pass);
+alert("התחברת");
+}
+
+window.addItem = async function(){
+
+if(!currentUser){
+alert("צריך להתחבר קודם");
+return;
+}
+
+const name=document.getElementById("itemName").value;
+const date=document.getElementById("borrowDate").value;
+
+const d=new Date(date);
+const day=d.getDay();
+const hour=d.getHours();
+
+if(day===5||day===6){
+alert("אין השאלה בשישי או שבת");
+return;
+}
+
+if(hour<8||hour>=15){
+alert("רק בין 08:00 ל15:00");
+return;
+}
+
+await addDoc(collection(db,"items"),{
+name:name,
+date:date,
+user:currentUser.email
+});
+
+alert("נשמר!");
+loadItems();
+}
+
+async function loadItems(){
+const snapshot=await getDocs(collection(db,"items"));
+let html="";
+snapshot.forEach((docItem)=>{
+const data=docItem.data();
+html+=`
+<div class="card">
+<h3>${data.name}</h3>
+<p>${data.date}</p>
+<p>${data.user}</p>
+</div>
+`;
+});
+document.getElementById("itemsContainer").innerHTML=html;
+}
+</script>
+</head>
+
+<body>
+
+<header>
+<h1>תולו</h1>
+<p>ספריית חפצים קהילתית</p>
+<p>שעות פעילות: א-ה 08:00-15:00</p>
+</header>
+
+<section>
+<h2>הרשמה / התחברות</h2>
+<input id="email" placeholder="אימייל">
+<input id="password" type="password" placeholder="סיסמה">
+<button onclick="register()">הרשמה</button>
+<button onclick="login()">התחברות</button>
+</section>
+
+<section>
+<h2>השאל חפץ</h2>
+<input id="itemName" placeholder="שם חפץ">
+<input type="datetime-local" id="borrowDate">
+<button onclick="addItem()">השאל</button>
+</section>
+
+<section>
+<h2>השאלות קיימות</h2>
+<div id="itemsContainer"></div>
+</section>
+
+</body>
+</html>
