@@ -134,6 +134,13 @@ await addDoc(collection(db,"items"),{
 alert("נשמר!");
 loadItems();
 }
+function showItems(){
+    if(!currentUser){
+        alert("אנא התחבר כדי לראות את החפצים");
+        return;
+    }
+    loadItems();
+}
 
 async function loadItems(){
 const snapshot=await getDocs(collection(db,"items"));
@@ -178,10 +185,12 @@ document.getElementById("itemsContainer").innerHTML=html;
 
 <section>
 <h2>השאלות קיימות</h2>
+<button onclick="showItems()">הצג את כל החפצים</button>
 <div id="itemsContainer"></div>
 </section>
 
 </body>
 </html>
+
 
 
