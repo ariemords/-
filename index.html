@@ -52,7 +52,7 @@ img{
 </head>
 <body>
 
-<!-- מסך בית -->
+<!-- מסך הבית -->
 <div id="homeScreen">
     <header>
         <h1>המתרימים שתורמים</h1>
@@ -90,23 +90,27 @@ img{
 
 <script>
 let currentUser = null;
-let items = []; // רשימת חפצים זמנית
+let items = [];
 
+// הרשמה פשוטה
 function register(){
     const username = document.getElementById("registerName").value.trim();
     if(!username) return alert("אנא הזן שם משתמש");
     alert(`נרשמת בהצלחה כ-${username}`);
 }
 
+// התחברות
 function login(){
     const username = document.getElementById("loginName").value.trim() || "אורח";
     currentUser = { email: username };
     alert(`התחברת בהצלחה כ-${username}`);
 
+    // מעבר למסך פנימי
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("appScreen").style.display = "block";
 }
 
+// הוספת חפץ כולל תמונה
 function addItem(){
     if(!currentUser) return alert("אנא התחבר כדי להוסיף חפץ");
 
@@ -133,9 +137,10 @@ function addItem(){
     loadItems();
 }
 
+// הצגת חפצים
 function loadItems(){
     const container = document.getElementById("itemsContainer");
-    if(!currentUser) {
+    if(!currentUser){
         container.innerHTML = "<p>אנא התחבר כדי לראות את החפצים</p>";
         return;
     }
@@ -157,6 +162,7 @@ function loadItems(){
     container.innerHTML = html;
 }
 
+// כפתור הצג חפצים
 function showItems(){
     if(!currentUser) return alert("אנא התחבר כדי לראות את החפצים");
     loadItems();
