@@ -100,27 +100,35 @@ alert("צריך להתחבר קודם");
 return;
 }
 
-const name=document.getElementById("itemName").value;
-const date=document.getElementById("borrowDate").value;
+const name = document.getElementById("itemName").value;
+const date = document.getElementById("borrowDate").value;
 
-const d=new Date(date);
-const day=d.getDay();
-const hour=d.getHours();
-
-if(day===5||day===6){
-alert("אין השאלה בשישי או שבת");
-return;
+if(name.trim() === "" || date.trim() === ""){
+    alert("אנא מלא את כל השדות");
+    return;
 }
 
-if(hour<8||hour>=15){
-alert("רק בין 08:00 ל15:00");
-return;
+const d = new Date(date);
+const day = d.getDay();
+const hour = d.getHours();
+
+if(day === 5 || day === 6){
+    alert("אין השאלה בשישי או שבת");
+    return;
 }
+
+if(hour < 8 || hour >= 15){
+    alert("רק בין 08:00 ל15:00");
+    return;
+}
+
+// שמירת חפץ עם שם המשתמש או "אורח"
+const userName = currentUser.email || "אורח";
 
 await addDoc(collection(db,"items"),{
-name:name,
-date:date,
-user:currentUser.email
+    name: name,
+    date: date,
+    user: userName
 });
 
 alert("נשמר!");
@@ -175,4 +183,5 @@ document.getElementById("itemsContainer").innerHTML=html;
 
 </body>
 </html>
+
 
