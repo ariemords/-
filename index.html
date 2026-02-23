@@ -13,6 +13,35 @@ background:#f4f4f4;
 text-align:center;
 }
 
+    <!-- מסך הבית -->
+<div id="homeScreen">
+  <h1>המתרימים שתורמים</h1>
+  <p>ספריית חפצים קהילתית</p>
+  
+  <h2>הרשמה</h2>
+  <input id="email" placeholder="שם משתמש">
+  <button onclick="register()">הרשמה</button>
+  
+  <h2>התחברות</h2>
+  <input id="loginName" placeholder="שם משתמש">
+  <button onclick="login()">התחברות</button>
+</div>
+
+<!-- מסך פנימי – אחרי התחברות -->
+<div id="appScreen" style="display:none;">
+  <section>
+    <h2>הוספת חפץ</h2>
+    <input id="itemName" placeholder="שם חפץ">
+    <input type="file" id="itemImage">
+    <button onclick="addItem()">הוסף חפץ</button>
+  </section>
+
+  <section>
+    <h2>חפצים קיימים</h2>
+    <button onclick="showItems()">הצג את כל החפצים</button>
+    <div id="itemsContainer"></div>
+  </section>
+</div>
 header{
 background:#2c3e50;
 color:white;
@@ -183,6 +212,90 @@ document.getElementById("itemsContainer").innerHTML=html;
 <button onclick="addItem()">השאל</button>
 </section>
 
+    let currentUser = null;
+
+// כניסה ללא סיסמה
+function login(){
+    const username = document.getElementById("loginName").value || "אורח";
+    currentUser = { email: username };
+
+    // הסתר מסך בית והראה מסך פנימי
+    document.getElementById("homeScreen").style.display = "none";
+    document.getElementById("appScreen").style.display = "block";
+}
+
+// הרשמה פשוטה (זה רק לדוגמא, לא משתמש בסיסמה)
+function register(){
+    const username = document.getElementById("email").value || "אורח";
+    alert(`נרשמת בהצלחה בתור ${username}`);
+}
+
+// הוספת חפץ כולל תמונה
+async function addItem(){
+    if(!currentUser){
+        alert("אנא התחבר כדי להוסיף חפץ");
+        return;
+    }
+
+    const name = document.getElementById("itemName").value;
+    const imageFile = document.getElementById("itemImage").files[0];
+
+    if(!name){
+        alert("אנא הזן שם חפץ");
+        return;
+    }
+
+    // כאן אפשר לשלב Firebase Storage אם רוצים לשמור את התמונה
+    let imageUrl = "";
+    if(imageFile){
+        // דוגמא: הפיכת הקובץ ל-URL זמני (לא נשמר על השרת)
+        imageUrl = URL.createObjectURL(imageFile);
+    }
+
+    // שמירה של החפץ עם URL של התמונה
+    await addDoc(collection(db,"items"),{
+        name: name,
+        user: currentUser.email,
+        image: imageUrl,
+        date: new Date().toISOString()
+    });
+
+    alert("חפץ נוסף בהצלחה!");
+    loadItems();
+}
+
+// הצגת חפצים (רק למתחבר)
+async function loadItems(){
+    const container = document.getElementById("itemsContainer");
+    if(!currentUser){
+        container.innerHTML = "<p>אנא התחבר כדי לראות את החפצים</p>";
+        return;
+    }
+
+    const snapshot = await getDocs(collection(db,"items"));
+    let html = "";
+    snapshot.forEach(docItem => {
+        const data = docItem.data();
+        html += `<div class="card">
+            <h3>${data.name}</h3>
+            <p>מעלה על ידי: ${data.user}</p>`;
+        if(data.image){
+            html += `<img src="${data.image}" style="max-width:100%; border-radius:5px;">`;
+        }
+        html += `</div>`;
+    });
+
+    if(html === "") html = "<p>אין חפצים להצגה</p>";
+    container.innerHTML = html;
+}
+
+function showItems(){
+    if(!currentUser){
+        alert("אנא התחבר כדי לראות את החפצים");
+        return;
+    }
+    loadItems();
+}
 <section>
 <h2>השאלות קיימות</h2>
 <button onclick="showItems()">הצג את כל החפצים</button>
@@ -191,6 +304,7 @@ document.getElementById("itemsContainer").innerHTML=html;
 
 </body>
 </html>
+
 
 
 
