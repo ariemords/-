@@ -112,7 +112,19 @@ function login(){
     const username = document.getElementById("loginName").value.trim() || "אורח";
     currentUser = { email: username };
     alert(`התחברת בהצלחה כ-${username}`);
+    
+const name=document.getElementById("itemName").value;
+    const date=document.getElementById("borrowDate").value;
+    
+    const d=new Date(date);
+    const day=d.getDay();
+const hour=d.getHours();
+    if(day===5||day===6){ alert("אין השאלה בשישי או שבת"); return; }
+    if(day===5||day===6){ alert("אין השאלה בשישי או שבת"); return; }
 
+    await addDoc(collection(db,"items"),{ name:name, date:date, user:currentUser.email 
+                                        }); alert("נשמר!"); loadItems(); }
+    
     // הסתרת מסך הבית והצגת מסך פנימי
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("appScreen").style.display = "block";
@@ -179,4 +191,5 @@ function showItems(){
 
 </body>
 </html>
+
 
