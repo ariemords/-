@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>תולו - ספריית חפצים</title>
+<title>המתרימים שתורמים - ספריית חפצים</title>
 
 <style>
 body{
@@ -86,11 +86,11 @@ await createUserWithEmailAndPassword(auth,email,pass);
 alert("נרשמת בהצלחה");
 }
 
-window.login = async function(){
-const email=document.getElementById("email").value;
-const pass=document.getElementById("password").value;
-await signInWithEmailAndPassword(auth,email,pass);
-alert("התחברת");
+window.login = function(){
+    const email = document.getElementById("email").value || "אורח";
+    currentUser = { email: email };
+    alert("התחברת בהצלחה!");
+    loadItems();
 }
 
 window.addItem = async function(){
@@ -148,7 +148,7 @@ document.getElementById("itemsContainer").innerHTML=html;
 <body>
 
 <header>
-<h1>תולו</h1>
+<h1>המתרימים שתורמיםו</h1>
 <p>ספריית חפצים קהילתית</p>
 <p>שעות פעילות: א-ה 08:00-15:00</p>
 </header>
@@ -175,3 +175,4 @@ document.getElementById("itemsContainer").innerHTML=html;
 
 </body>
 </html>
+
