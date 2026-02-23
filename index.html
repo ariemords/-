@@ -74,6 +74,13 @@ img{
 </section>
 </div>
 
+<div id="main">
+  <h2>מה תרצה לעשות?</h2>
+
+  <button onclick="showBorrow()">השאלת חפץ</button>
+  <button onclick="showDonate()">תרומת חפץ</button>
+</div>
+    
 <!-- מסך פנימי -->
 <div id="appScreen" style="display:none;">
 
@@ -175,6 +182,18 @@ function showItems(){
     loadItems();
 }
 
+<div id="donateScreen" style="display:none;">
+  <h2>תרומת חפץ</h2>
+
+  <input type="text" placeholder="שם החפץ"><br><br>
+
+  <input type="file"><br><br>
+
+  <textarea placeholder="הערות על החפץ"></textarea><br><br>
+
+  <button onclick="backToMain()">חזור</button>
+</div>
+    
 function loadItems(){
 
     const container = document.getElementById("itemsContainer");
@@ -204,4 +223,5 @@ function loadItems(){
 <script src="script.js"></script>
 </body>
 </html>
+
 
