@@ -3,308 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>המתרימים שתורמים - ספריית חפצים</title>
-
+<title>המתרימים שתורמים</title>
 <style>
 body{
-font-family:Arial;
-margin:0;
-background:#f4f4f4;
-text-align:center;
+    font-family: Arial;
+    margin:0;
+    background:#f4f4f4;
+    text-align:center;
 }
-
-    <!-- מסך הבית -->
-<div id="homeScreen">
-  <h1>המתרימים שתורמים</h1>
-  <p>ספריית חפצים קהילתית</p>
-  
-  <h2>הרשמה</h2>
-  <input id="email" placeholder="שם משתמש">
-  <button onclick="register()">הרשמה</button>
-  
-  <h2>התחברות</h2>
-  <input id="loginName" placeholder="שם משתמש">
-  <button onclick="login()">התחברות</button>
-</div>
-
-<!-- מסך פנימי – אחרי התחברות -->
-<div id="appScreen" style="display:none;">
-  <section>
-    <h2>הוספת חפץ</h2>
-    <input id="itemName" placeholder="שם חפץ">
-    <input type="file" id="itemImage">
-    <button onclick="addItem()">הוסף חפץ</button>
-  </section>
-
-  <section>
-    <h2>חפצים קיימים</h2>
-    <button onclick="showItems()">הצג את כל החפצים</button>
-    <div id="itemsContainer"></div>
-  </section>
-</div>
 header{
-background:#2c3e50;
-color:white;
-padding:20px;
+    background:#2c3e50;
+    color:white;
+    padding:20px;
 }
-
 section{
-margin:20px;
+    margin:20px;
 }
-
 input,textarea,button{
-display:block;
-margin:10px auto;
-padding:8px;
-width:90%;
-max-width:400px;
+    display:block;
+    margin:10px auto;
+    padding:8px;
+    width:90%;
+    max-width:400px;
 }
-
 button{
-background:#2980b9;
-color:white;
-border:none;
-cursor:pointer;
+    background:#2980b9;
+    color:white;
+    border:none;
+    cursor:pointer;
 }
-
 button:hover{
-background:#1f6691;
+    background:#1f6691;
 }
-
 .card{
-background:white;
-padding:15px;
-margin:10px auto;
-width:90%;
-max-width:400px;
-border-radius:8px;
+    background:white;
+    padding:15px;
+    margin:10px auto;
+    width:90%;
+    max-width:400px;
+    border-radius:8px;
+    text-align:right;
+}
+img{
+    max-width:100%;
+    border-radius:5px;
 }
 </style>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "כאן_תדביק",
-authDomain: "כאן",
-projectId: "כאן",
-storageBucket: "כאן",
-messagingSenderId: "כאן",
-appId: "כאן"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
-
-let currentUser = null;
-
-onAuthStateChanged(auth, (user)=>{
-currentUser = user;
-if(user){
-loadItems();
-}
-});
-
-window.register = async function(){
-const email=document.getElementById("email").value;
-const pass=document.getElementById("password").value;
-await createUserWithEmailAndPassword(auth,email,pass);
-alert("נרשמת בהצלחה");
-}
-
-window.login = function(){
-    const email = document.getElementById("email").value || "אורח";
-    currentUser = { email: email };
-    alert("התחברת בהצלחה!");
-    loadItems();
-}
-
-window.addItem = async function(){
-
-if(!currentUser){
-alert("צריך להתחבר קודם");
-return;
-}
-
-const name = document.getElementById("itemName").value;
-const date = document.getElementById("borrowDate").value;
-
-if(name.trim() === "" || date.trim() === ""){
-    alert("אנא מלא את כל השדות");
-    return;
-}
-
-const d = new Date(date);
-const day = d.getDay();
-const hour = d.getHours();
-
-if(day === 5 || day === 6){
-    alert("אין השאלה בשישי או שבת");
-    return;
-}
-
-if(hour < 8 || hour >= 15){
-    alert("רק בין 08:00 ל15:00");
-    return;
-}
-
-// שמירת חפץ עם שם המשתמש או "אורח"
-const userName = currentUser.email || "אורח";
-
-await addDoc(collection(db,"items"),{
-    name: name,
-    date: date,
-    user: userName
-});
-
-alert("נשמר!");
-loadItems();
-}
-function showItems(){
-    if(!currentUser){
-        alert("אנא התחבר כדי לראות את החפצים");
-        return;
-    }
-    loadItems();
-}
-
-async function loadItems(){
-const snapshot=await getDocs(collection(db,"items"));
-let html="";
-snapshot.forEach((docItem)=>{
-const data=docItem.data();
-html+=`
-<div class="card">
-<h3>${data.name}</h3>
-<p>${data.date}</p>
-<p>${data.user}</p>
-</div>
-`;
-});
-document.getElementById("itemsContainer").innerHTML=html;
-}
-</script>
 </head>
-
 <body>
 
-<header>
-<h1>המתרימים שתורמיםו</h1>
-<p>ספריית חפצים קהילתית</p>
-<p>שעות פעילות: א-ה 08:00-15:00</p>
-</header>
+<!-- מסך בית -->
+<div id="homeScreen">
+    <header>
+        <h1>המתרימים שתורמים</h1>
+        <p>ספריית חפצים קהילתית</p>
+    </header>
 
-<section>
-<h2>הרשמה / התחברות</h2>
-<input id="email" placeholder="אימייל">
-<input id="password" type="password" placeholder="סיסמה">
-<button onclick="register()">הרשמה</button>
-<button onclick="login()">התחברות</button>
-</section>
+    <section>
+        <h2>הרשמה</h2>
+        <input id="registerName" placeholder="שם משתמש">
+        <button onclick="register()">הרשמה</button>
+    </section>
 
-<section>
-<h2>השאל חפץ</h2>
-<input id="itemName" placeholder="שם חפץ">
-<input type="datetime-local" id="borrowDate">
-<button onclick="addItem()">השאל</button>
-</section>
+    <section>
+        <h2>התחברות</h2>
+        <input id="loginName" placeholder="שם משתמש">
+        <button onclick="login()">התחברות</button>
+    </section>
+</div>
 
-    let currentUser = null;
+<!-- מסך פנימי -->
+<div id="appScreen" style="display:none;">
+    <section>
+        <h2>הוספת חפץ</h2>
+        <input id="itemName" placeholder="שם חפץ">
+        <input type="file" id="itemImage">
+        <button onclick="addItem()">הוסף חפץ</button>
+    </section>
 
-// כניסה ללא סיסמה
+    <section>
+        <h2>חפצים קיימים</h2>
+        <button onclick="showItems()">הצג את כל החפצים</button>
+        <div id="itemsContainer"></div>
+    </section>
+</div>
+
+<script>
+let currentUser = null;
+let items = []; // רשימת חפצים זמנית
+
+function register(){
+    const username = document.getElementById("registerName").value.trim();
+    if(!username) return alert("אנא הזן שם משתמש");
+    alert(`נרשמת בהצלחה כ-${username}`);
+}
+
 function login(){
-    const username = document.getElementById("loginName").value || "אורח";
+    const username = document.getElementById("loginName").value.trim() || "אורח";
     currentUser = { email: username };
+    alert(`התחברת בהצלחה כ-${username}`);
 
-    // הסתר מסך בית והראה מסך פנימי
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("appScreen").style.display = "block";
 }
 
-// הרשמה פשוטה (זה רק לדוגמא, לא משתמש בסיסמה)
-function register(){
-    const username = document.getElementById("email").value || "אורח";
-    alert(`נרשמת בהצלחה בתור ${username}`);
-}
+function addItem(){
+    if(!currentUser) return alert("אנא התחבר כדי להוסיף חפץ");
 
-// הוספת חפץ כולל תמונה
-async function addItem(){
-    if(!currentUser){
-        alert("אנא התחבר כדי להוסיף חפץ");
-        return;
-    }
+    const name = document.getElementById("itemName").value.trim();
+    const fileInput = document.getElementById("itemImage");
+    const file = fileInput.files[0];
 
-    const name = document.getElementById("itemName").value;
-    const imageFile = document.getElementById("itemImage").files[0];
+    if(!name) return alert("אנא הזן שם חפץ");
 
-    if(!name){
-        alert("אנא הזן שם חפץ");
-        return;
-    }
-
-    // כאן אפשר לשלב Firebase Storage אם רוצים לשמור את התמונה
     let imageUrl = "";
-    if(imageFile){
-        // דוגמא: הפיכת הקובץ ל-URL זמני (לא נשמר על השרת)
-        imageUrl = URL.createObjectURL(imageFile);
+    if(file){
+        imageUrl = URL.createObjectURL(file);
     }
 
-    // שמירה של החפץ עם URL של התמונה
-    await addDoc(collection(db,"items"),{
+    items.push({
         name: name,
         user: currentUser.email,
-        image: imageUrl,
-        date: new Date().toISOString()
+        image: imageUrl
     });
 
     alert("חפץ נוסף בהצלחה!");
+    fileInput.value = "";
+    document.getElementById("itemName").value = "";
     loadItems();
 }
 
-// הצגת חפצים (רק למתחבר)
-async function loadItems(){
+function loadItems(){
     const container = document.getElementById("itemsContainer");
-    if(!currentUser){
+    if(!currentUser) {
         container.innerHTML = "<p>אנא התחבר כדי לראות את החפצים</p>";
         return;
     }
 
-    const snapshot = await getDocs(collection(db,"items"));
+    if(items.length === 0){
+        container.innerHTML = "<p>אין חפצים להצגה</p>";
+        return;
+    }
+
     let html = "";
-    snapshot.forEach(docItem => {
-        const data = docItem.data();
+    items.forEach(item => {
         html += `<div class="card">
-            <h3>${data.name}</h3>
-            <p>מעלה על ידי: ${data.user}</p>`;
-        if(data.image){
-            html += `<img src="${data.image}" style="max-width:100%; border-radius:5px;">`;
-        }
+                    <h3>${item.name}</h3>
+                    <p>מעלה על ידי: ${item.user}</p>`;
+        if(item.image) html += `<img src="${item.image}">`;
         html += `</div>`;
     });
 
-    if(html === "") html = "<p>אין חפצים להצגה</p>";
     container.innerHTML = html;
 }
 
 function showItems(){
-    if(!currentUser){
-        alert("אנא התחבר כדי לראות את החפצים");
-        return;
-    }
+    if(!currentUser) return alert("אנא התחבר כדי לראות את החפצים");
     loadItems();
 }
-<section>
-<h2>השאלות קיימות</h2>
-<button onclick="showItems()">הצג את כל החפצים</button>
-<div id="itemsContainer"></div>
-</section>
+</script>
 
 </body>
 </html>
-
-
-
-
