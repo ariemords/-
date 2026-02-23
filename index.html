@@ -2,245 +2,124 @@
 <html lang="he">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>המתרימים שתורמים</title>
+<title>מערכת השאלת ותרומת חפצים</title>
 
 <style>
-body{
-    font-family:Arial;
-    margin:0;
-    background:#f4f4f4;
-    text-align:center;
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #f2f2f2;
 }
-header{
-    background:#2c3e50;
-    color:white;
-    padding:20px;
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
 }
-section{
-    margin:20px;
+
+input, textarea {
+  padding: 8px;
+  width: 200px;
+  margin: 5px;
 }
-input,button{
-    display:block;
-    margin:10px auto;
-    padding:8px;
-    width:90%;
-    max-width:400px;
+
+.screen {
+  display: none;
+  margin-top: 50px;
 }
-button{
-    background:#2980b9;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-button:hover{
-    background:#1f6691;
-}
-.card{
-    background:white;
-    padding:15px;
-    margin:10px auto;
-    width:90%;
-    max-width:400px;
-    border-radius:8px;
-    text-align:right;
-}
-img{
-    max-width:100%;
-    border-radius:5px;
+
+#home {
+  display: block;
 }
 </style>
 </head>
+
 <body>
 
 <!-- מסך בית -->
-<div id="homeScreen">
-<header>
-<h1>המתרימים שתורמים</h1>
-<p>ספריית חפצים קהילתית</p>
-<p>שעות פעילות: א-ה 08:00-15:00</p>
-</header>
-
-<section>
-<h2>הרשמה</h2>
-<input id="registerName" placeholder="שם משתמש">
-<button onclick="register()">הרשמה</button>
-</section>
-
-<section>
-<h2>התחברות</h2>
-<input id="loginName" placeholder="שם משתמש">
-<button onclick="login()">התחברות</button>
-</section>
+<div id="home" class="screen">
+  <h1>ברוך הבא</h1>
+  <button onclick="showLogin()">התחברות</button>
 </div>
 
-<div id="main">
+<!-- מסך התחברות -->
+<div id="login" class="screen">
+  <h2>התחברות</h2>
+  <input type="text" id="username" placeholder="שם משתמש"><br>
+  <button onclick="enterSite()">כניסה</button><br>
+  <button onclick="goHome()">חזור</button>
+</div>
+
+<!-- מסך ראשי אחרי התחברות -->
+<div id="main" class="screen">
   <h2>מה תרצה לעשות?</h2>
-
   <button onclick="showBorrow()">השאלת חפץ</button>
-  <button onclick="showDonate()">תרומת חפץ</button>
+  <button onclick="showDonate()">תרומת חפץ</button><br>
+  <button onclick="logout()">התנתק</button>
 </div>
 
-    <div id="borrowScreen" style="display:none;">
+<!-- השאלת חפץ -->
+<div id="borrow" class="screen">
   <h2>השאלת חפץ</h2>
-  <input type="text" placeholder="שם החפץ">
-  <input type="text" placeholder="לכמה זמן?">
+  <input type="text" placeholder="שם החפץ"><br>
+  <input type="text" placeholder="לכמה זמן?"><br>
   <button onclick="backToMain()">חזור</button>
 </div>
 
-    <div id="donateScreen" style="display:none;">
+<!-- תרומת חפץ -->
+<div id="donate" class="screen">
   <h2>תרומת חפץ</h2>
-
-  <input type="text" placeholder="שם החפץ"><br><br>
-
-  <input type="file"><br><br>
-
-  <textarea placeholder="הערות על החפץ"></textarea><br><br>
-
+  <input type="text" placeholder="שם החפץ"><br>
+  <input type="file"><br>
+  <textarea placeholder="הערות"></textarea><br>
   <button onclick="backToMain()">חזור</button>
-</div>
-<!-- מסך פנימי -->
-<div id="appScreen" style="display:none;">
-
-<section>
-<h2>השאל חפץ</h2>
-<input id="itemName" placeholder="שם חפץ">
-<input type="datetime-local" id="borrowDate">
-<input type="file" id="itemImage">
-<button onclick="addItem()">השאל</button>
-</section>
-
-<section>
-<h2>השאלות קיימות</h2>
-<button onclick="showItems()">הצג את כל החפצים</button>
-<div id="itemsContainer"></div>
-</section>
-
 </div>
 
 <script>
-
-let currentUser = null;
-let items = [];
-
-// הרשמה
-function register(){
-    const name = document.getElementById("registerName").value.trim();
-    if(!name) return alert("אנא הזן שם משתמש");
-    alert("נרשמת בהצלחה!");
+function hideAll() {
+  document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
 }
 
-// התחברות
-function login(){
-    const name = document.getElementById("loginName").value.trim() || "אורח";
-    currentUser = { email: name };
-
-    document.getElementById("homeScreen").style.display="none";
-    document.getElementById("appScreen").style.display="block";
-
-    alert("התחברת בהצלחה!");
+function showLogin() {
+  hideAll();
+  document.getElementById("login").style.display = "block";
 }
 
-// הוספת חפץ עם בדיקות זמן ותאריך
-function addItem(){
-
-    if(!currentUser){
-        alert("צריך להתחבר קודם");
-        return;
-    }
-
-    const name = document.getElementById("itemName").value.trim();
-    const dateValue = document.getElementById("borrowDate").value;
-    const file = document.getElementById("itemImage").files[0];
-
-    if(!name || !dateValue){
-        alert("אנא מלא את כל השדות");
-        return;
-    }
-
-    const d = new Date(dateValue);
-    const day = d.getDay();   // 0=ראשון 6=שבת
-    const hour = d.getHours();
-
-    // חסימת שישי (5) ושבת (6)
-    if(day === 5 || day === 6){
-        alert("אין השאלה בשישי או שבת");
-        return;
-    }
-
-    // בדיקת שעות
-    if(hour < 8 || hour >= 15){
-        alert("רק בין 08:00 ל15:00");
-        return;
-    }
-
-    let imageUrl = "";
-    if(file){
-        imageUrl = URL.createObjectURL(file);
-    }
-
-    items.push({
-        name: name,
-        date: dateValue,
-        user: currentUser.email,
-        image: imageUrl
-    });
-
-    alert("נשמר בהצלחה!");
-    document.getElementById("itemName").value="";
-    document.getElementById("borrowDate").value="";
-    document.getElementById("itemImage").value="";
+function enterSite() {
+  const user = document.getElementById("username").value;
+  if (user === "") {
+    alert("תכניס שם משתמש");
+    return;
+  }
+  hideAll();
+  document.getElementById("main").style.display = "block";
 }
 
-function showItems(){
-    if(!currentUser){
-        alert("אנא התחבר כדי לראות חפצים");
-        return;
-    }
-    loadItems();
+function showBorrow() {
+  hideAll();
+  document.getElementById("borrow").style.display = "block";
 }
 
-<div id="donateScreen" style="display:none;">
-  <h2>תרומת חפץ</h2>
-
-  <input type="text" placeholder="שם החפץ"><br><br>
-
-  <input type="file"><br><br>
-
-  <textarea placeholder="הערות על החפץ"></textarea><br><br>
-
-  <button onclick="backToMain()">חזור</button>
-</div>
-    
-function loadItems(){
-
-    const container = document.getElementById("itemsContainer");
-
-    if(items.length === 0){
-        container.innerHTML="<p>אין חפצים להצגה</p>";
-        return;
-    }
-
-    let html="";
-
-    items.forEach(item=>{
-        html+=`
-        <div class="card">
-            <h3>${item.name}</h3>
-            <p>תאריך: ${item.date}</p>
-            <p>מעלה: ${item.user}</p>
-            ${item.image ? `<img src="${item.image}">` : ""}
-        </div>
-        `;
-    });
-
-    container.innerHTML=html;
+function showDonate() {
+  hideAll();
+  document.getElementById("donate").style.display = "block";
 }
 
+function backToMain() {
+  hideAll();
+  document.getElementById("main").style.display = "block";
+}
+
+function goHome() {
+  hideAll();
+  document.getElementById("home").style.display = "block";
+}
+
+function logout() {
+  hideAll();
+  document.getElementById("home").style.display = "block";
+}
 </script>
-<script src="script.js"></script>
+
 </body>
 </html>
-
-
-
