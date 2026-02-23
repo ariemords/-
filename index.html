@@ -80,7 +80,25 @@ img{
   <button onclick="showBorrow()">השאלת חפץ</button>
   <button onclick="showDonate()">תרומת חפץ</button>
 </div>
-    
+
+    <div id="borrowScreen" style="display:none;">
+  <h2>השאלת חפץ</h2>
+  <input type="text" placeholder="שם החפץ">
+  <input type="text" placeholder="לכמה זמן?">
+  <button onclick="backToMain()">חזור</button>
+</div>
+
+    <div id="donateScreen" style="display:none;">
+  <h2>תרומת חפץ</h2>
+
+  <input type="text" placeholder="שם החפץ"><br><br>
+
+  <input type="file"><br><br>
+
+  <textarea placeholder="הערות על החפץ"></textarea><br><br>
+
+  <button onclick="backToMain()">חזור</button>
+</div>
 <!-- מסך פנימי -->
 <div id="appScreen" style="display:none;">
 
@@ -223,5 +241,6 @@ function loadItems(){
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
