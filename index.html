@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>המתרימים שתורמים</title>
+
 <style>
 body{
-    font-family: Arial;
+    font-family:Arial;
     margin:0;
     background:#f4f4f4;
     text-align:center;
@@ -19,7 +20,7 @@ header{
 section{
     margin:20px;
 }
-input,textarea,button{
+input,button{
     display:block;
     margin:10px auto;
     padding:8px;
@@ -52,144 +53,154 @@ img{
 </head>
 <body>
 
-<!-- מסך הבית -->
+<!-- מסך בית -->
 <div id="homeScreen">
-    <header>
-        <h1>המתרימים שתורמים</h1>
-        <p>ספריית חפצים קהילתית</p>
-        <p>שעות פעילות: א-ה 08:00-15:00</p>
-    </header>
+<header>
+<h1>המתרימים שתורמים</h1>
+<p>ספריית חפצים קהילתית</p>
+<p>שעות פעילות: א-ה 08:00-15:00</p>
+</header>
 
-    <section>
-        <h2>הרשמה</h2>
-        <input id="registerName" placeholder="שם משתמש">
-        <button onclick="register()">הרשמה</button>
-    </section>
+<section>
+<h2>הרשמה</h2>
+<input id="registerName" placeholder="שם משתמש">
+<button onclick="register()">הרשמה</button>
+</section>
 
-    <section>
-        <h2>התחברות</h2>
-        <input id="loginName" placeholder="שם משתמש">
-        <button onclick="login()">התחברות</button>
-    </section>
+<section>
+<h2>התחברות</h2>
+<input id="loginName" placeholder="שם משתמש">
+<button onclick="login()">התחברות</button>
+</section>
 </div>
 
 <!-- מסך פנימי -->
 <div id="appScreen" style="display:none;">
-    <section>
-        <h2>הוספת חפץ</h2>
-        <input id="itemName" placeholder="שם חפץ">
-        <input type="file" id="itemImage">
-        <button onclick="addItem()">הוסף חפץ</button>
-    </section>
-
-    <section>
-        <h2>חפצים קיימים</h2>
-        <button onclick="showItems()">הצג את כל החפצים</button>
-        <div id="itemsContainer"></div>
-    </section>
-</div>
 
 <section>
-  <h2>השאל חפץ</h2>
-  <input id="itemName" placeholder="שם חפץ">
-  <input type="datetime-local" id="borrowDate">
-  <button onclick="addItem()">השאל</button>
+<h2>השאל חפץ</h2>
+<input id="itemName" placeholder="שם חפץ">
+<input type="datetime-local" id="borrowDate">
+<input type="file" id="itemImage">
+<button onclick="addItem()">השאל</button>
 </section>
-    
+
+<section>
+<h2>השאלות קיימות</h2>
+<button onclick="showItems()">הצג את כל החפצים</button>
+<div id="itemsContainer"></div>
+</section>
+
+</div>
+
 <script>
+
 let currentUser = null;
 let items = [];
 
-// הרשמה פשוטה
+// הרשמה
 function register(){
-    const username = document.getElementById("registerName").value.trim();
-    if(!username) return alert("אנא הזן שם משתמש");
-    alert(`נרשמת בהצלחה כ-${username}`);
+    const name = document.getElementById("registerName").value.trim();
+    if(!name) return alert("אנא הזן שם משתמש");
+    alert("נרשמת בהצלחה!");
 }
 
 // התחברות
 function login(){
-    const username = document.getElementById("loginName").value.trim() || "אורח";
-    currentUser = { email: username };
-    alert(`התחברת בהצלחה כ-${username}`);
-    
-const name=document.getElementById("itemName").value;
-    const date=document.getElementById("borrowDate").value;
-    
-    const d=new Date(date);
-    const day=d.getDay();
-const hour=d.getHours();
-    if(day===5||day===6){ alert("אין השאלה בשישי או שבת"); return; }
-    if(day===5||day===6){ alert("אין השאלה בשישי או שבת"); return; }
+    const name = document.getElementById("loginName").value.trim() || "אורח";
+    currentUser = { email: name };
 
-    await addDoc(collection(db,"items"),{ name:name, date:date, user:currentUser.email 
-                                        }); alert("נשמר!"); loadItems(); }
-    
-    // הסתרת מסך הבית והצגת מסך פנימי
-    document.getElementById("homeScreen").style.display = "none";
-    document.getElementById("appScreen").style.display = "block";
+    document.getElementById("homeScreen").style.display="none";
+    document.getElementById("appScreen").style.display="block";
+
+    alert("התחברת בהצלחה!");
 }
 
-// הוספת חפץ כולל תמונה
+// הוספת חפץ עם בדיקות זמן ותאריך
 function addItem(){
-    if(!currentUser) return alert("אנא התחבר כדי להוסיף חפץ");
+
+    if(!currentUser){
+        alert("צריך להתחבר קודם");
+        return;
+    }
 
     const name = document.getElementById("itemName").value.trim();
-    const fileInput = document.getElementById("itemImage");
-    const file = fileInput.files[0];
+    const dateValue = document.getElementById("borrowDate").value;
+    const file = document.getElementById("itemImage").files[0];
 
-    if(!name) return alert("אנא הזן שם חפץ");
+    if(!name || !dateValue){
+        alert("אנא מלא את כל השדות");
+        return;
+    }
+
+    const d = new Date(dateValue);
+    const day = d.getDay();   // 0=ראשון 6=שבת
+    const hour = d.getHours();
+
+    // חסימת שישי (5) ושבת (6)
+    if(day === 5 || day === 6){
+        alert("אין השאלה בשישי או שבת");
+        return;
+    }
+
+    // בדיקת שעות
+    if(hour < 8 || hour >= 15){
+        alert("רק בין 08:00 ל15:00");
+        return;
+    }
 
     let imageUrl = "";
     if(file){
         imageUrl = URL.createObjectURL(file);
     }
-    
+
     items.push({
         name: name,
+        date: dateValue,
         user: currentUser.email,
         image: imageUrl
     });
 
-    alert("חפץ נוסף בהצלחה!");
-    fileInput.value = "";
-    document.getElementById("itemName").value = "";
+    alert("נשמר בהצלחה!");
+    document.getElementById("itemName").value="";
+    document.getElementById("borrowDate").value="";
+    document.getElementById("itemImage").value="";
+}
+
+function showItems(){
+    if(!currentUser){
+        alert("אנא התחבר כדי לראות חפצים");
+        return;
+    }
     loadItems();
 }
 
-// הצגת חפצים
 function loadItems(){
+
     const container = document.getElementById("itemsContainer");
-    if(!currentUser){
-        container.innerHTML = "<p>אנא התחבר כדי לראות את החפצים</p>";
-        return;
-    }
-const name=document.getElementById("itemName").value; const date=document.getElementById("borrowDate").value; const d=new Date(date); const day=d.getDay(); const hour=d.getHours(); if(day===5||day===6){ alert("אין השאלה בשישי או שבת"); return; } if(hour<8||hour>=15){ alert("רק בין 08:00 ל15:00"); return; } await addDoc(collection(db,"items"),{ name:name, date:date, user:currentUser.email }); alert("נשמר!"); loadItems(); }
+
     if(items.length === 0){
-        container.innerHTML = "<p>אין חפצים להצגה</p>";
+        container.innerHTML="<p>אין חפצים להצגה</p>";
         return;
     }
 
-    let html = "";
-    items.forEach(item => {
-        html += `<div class="card">
-                    <h3>${item.name}</h3>
-                    <p>מעלה על ידי: ${item.user}</p>`;
-        if(item.image) html += `<img src="${item.image}">`;
-        html += `</div>`;
+    let html="";
+
+    items.forEach(item=>{
+        html+=`
+        <div class="card">
+            <h3>${item.name}</h3>
+            <p>תאריך: ${item.date}</p>
+            <p>מעלה: ${item.user}</p>
+            ${item.image ? `<img src="${item.image}">` : ""}
+        </div>
+        `;
     });
 
-    container.innerHTML = html;
+    container.innerHTML=html;
 }
 
-// כפתור הצג חפצים
-function showItems(){
-    if(!currentUser) return alert("אנא התחבר כדי לראות את החפצים");
-    loadItems();
-}
 </script>
 
 </body>
 </html>
-
-
