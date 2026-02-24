@@ -13,39 +13,30 @@ body {
   color: white;
 }
 
-h1, h2 {
-  margin-top: 20px;
-}
-
-.screen {
-  display: none;
-  margin-top: 40px;
-}
-
-#home {
-  display: block;
-}
+.screen { display: none; margin-top: 40px; }
+#home { display: block; }
 
 .card {
   background: rgba(255,255,255,0.15);
-  padding: 30px;
+  padding: 25px;
   border-radius: 15px;
   display: inline-block;
-  min-width: 300px;
+  min-width: 320px;
+  margin: 10px;
 }
 
 input, textarea {
   width: 250px;
   padding: 10px;
-  margin: 8px;
+  margin: 6px;
   border-radius: 6px;
   border: none;
 }
 
 button {
-  padding: 15px 35px;
-  margin: 10px;
-  font-size: 18px;
+  padding: 12px 30px;
+  margin: 8px;
+  font-size: 16px;
   border: none;
   border-radius: 8px;
   background: #00b4ff;
@@ -53,22 +44,28 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #0088cc;
-}
+button:hover { background: #0088cc; }
 
-.list {
-  margin-top: 20px;
-  text-align: right;
-}
 .item {
   background: rgba(255,255,255,0.2);
   padding: 10px;
   border-radius: 8px;
   margin: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.deleteBtn {
+  background: #ff4d4d;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.deleteBtn:hover { background: #cc0000; }
+
 .message {
-  margin-top: 15px;
+  margin-top: 10px;
   font-weight: bold;
   color: #00ffcc;
 }
@@ -77,7 +74,6 @@ button:hover {
 
 <body>
 
-<!-- מסך בית -->
 <div id="home" class="screen">
   <div class="card">
     <h1>ברוך הבא</h1>
@@ -85,18 +81,15 @@ button:hover {
   </div>
 </div>
 
-<!-- התחברות -->
 <div id="login" class="screen">
   <div class="card">
     <h2>התחברות</h2>
     <input id="username" placeholder="שם משתמש">
     <br>
     <button onclick="login()">כניסה</button>
-    <button onclick="goHome()">חזור</button>
   </div>
 </div>
 
-<!-- מסך ראשי -->
 <div id="main" class="screen">
   <div class="card">
     <h2 id="hello"></h2>
@@ -105,13 +98,17 @@ button:hover {
     <button onclick="logout()">התנתק</button>
   </div>
 
-  <div class="card list">
+  <div class="card">
+    <h3>🔍 חיפוש חפץ</h3>
+    <input id="searchInput" placeholder="חפש..." oninput="loadItems()">
+  </div>
+
+  <div class="card">
     <h3>📦 רשימת חפצים</h3>
     <div id="items"></div>
   </div>
 </div>
 
-<!-- השאלה -->
 <div id="borrow" class="screen">
   <div class="card">
     <h2>השאלת חפץ</h2>
@@ -124,11 +121,11 @@ button:hover {
   </div>
 </div>
 
-<!-- תרומה -->
 <div id="donate" class="screen">
   <div class="card">
     <h2>תרומת חפץ</h2>
     <input id="donateName" placeholder="שם החפץ">
+    <input id="soldierName" placeholder="לעילוי נשמת...">
     <textarea id="donateNote" placeholder="הערות"></textarea>
     <br>
     <button onclick="saveDonate()">סיום</button>
@@ -142,15 +139,8 @@ function hideAll() {
   document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
 }
 
-function goHome() {
-  hideAll();
-  home.style.display = "block";
-}
-
-function goLogin() {
-  hideAll();
-  login.style.display = "block";
-}
+function goLogin() { hideAll(); login.style.display = "block"; }
+function backMain() { hideAll(); main.style.display = "block"; }
 
 function login() {
   const name = username.value.trim();
@@ -161,7 +151,7 @@ function login() {
 
 function loadUser() {
   const user = localStorage.getItem("user");
-  if (!user) return goHome();
+  if (!user) return home.style.display = "block";
   hideAll();
   main.style.display = "block";
   hello.innerText = "שלום " + user;
@@ -170,23 +160,11 @@ function loadUser() {
 
 function logout() {
   localStorage.removeItem("user");
-  goHome();
+  location.reload();
 }
 
-function showBorrow() {
-  hideAll();
-  borrow.style.display = "block";
-}
-
-function showDonate() {
-  hideAll();
-  donate.style.display = "block";
-}
-
-function backMain() {
-  hideAll();
-  main.style.display = "block";
-}
+function showBorrow() { hideAll(); borrow.style.display = "block"; }
+function showDonate() { hideAll(); donate.style.display = "block"; }
 
 function getItems() {
   return JSON.parse(localStorage.getItem("items") || "[]");
@@ -209,23 +187,37 @@ function saveBorrow() {
 
 function saveDonate() {
   const name = donateName.value;
-  if (!name) return alert("מלא שם חפץ");
+  const soldier = soldierName.value;
+  if (!name || !soldier) return alert("מלא את כל השדות");
   const items = getItems();
-  items.push("תרומה: " + name);
+  items.push("תרומה: " + name + " | לעילוי נשמת " + soldier);
   saveItems(items);
-  donateMsg.innerText = "תודה על תרומתך!";
+  donateMsg.innerText = "🙏 תודה על התרומה לעילוי נשמת " + soldier;
+  loadItems();
+}
+
+function deleteItem(index) {
+  const items = getItems();
+  items.splice(index, 1);
+  saveItems(items);
   loadItems();
 }
 
 function loadItems() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
   const itemsDiv = document.getElementById("items");
   const items = getItems();
   itemsDiv.innerHTML = "";
-  items.forEach(i => {
-    const d = document.createElement("div");
-    d.className = "item";
-    d.innerText = i;
-    itemsDiv.appendChild(d);
+  items.forEach((item, index) => {
+    if (item.toLowerCase().includes(search)) {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <span>${item}</span>
+        <button class="deleteBtn" onclick="deleteItem(${index})">🗑</button>
+      `;
+      itemsDiv.appendChild(div);
+    }
   });
 }
 
