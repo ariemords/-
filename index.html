@@ -8,71 +8,113 @@
 body {
   font-family: Arial;
   text-align: center;
-  background: #f2f2f2;
+  background: linear-gradient(to right, #1e3c72, #2a5298);
+  color: white;
+  margin: 0;
+}
+
+h1, h2 {
+  margin-top: 30px;
 }
 
 button {
-  padding: 10px 20px;
-  margin: 10px;
+  padding: 15px 40px;
+  margin: 15px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  background-color: #00b4ff;
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #0088cc;
+  transform: scale(1.05);
 }
 
 input, textarea {
-  padding: 8px;
-  width: 200px;
-  margin: 5px;
+  padding: 10px;
+  width: 250px;
+  margin: 8px;
+  border-radius: 6px;
+  border: none;
 }
 
 .screen {
   display: none;
-  margin-top: 50px;
+  margin-top: 60px;
 }
 
 #home {
   display: block;
+}
+
+.card {
+  background: rgba(255,255,255,0.1);
+  padding: 30px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.message {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #00ffcc;
 }
 </style>
 </head>
 
 <body>
 
-<!-- מסך בית -->
 <div id="home" class="screen">
-  <h1>ברוך הבא</h1>
-  <button onclick="showLogin()">התחברות</button>
+  <div class="card">
+    <h1>ברוך הבא</h1>
+    <button onclick="showLogin()">התחברות</button>
+  </div>
 </div>
 
-<!-- מסך התחברות -->
 <div id="login" class="screen">
-  <h2>התחברות</h2>
-  <input type="text" id="username" placeholder="שם משתמש"><br>
-  <button onclick="enterSite()">כניסה</button><br>
-  <button onclick="goHome()">חזור</button>
+  <div class="card">
+    <h2>התחברות</h2>
+    <input type="text" id="username" placeholder="שם משתמש"><br>
+    <button onclick="enterSite()">כניסה</button><br>
+    <button onclick="goHome()">חזור</button>
+  </div>
 </div>
 
-<!-- מסך ראשי אחרי התחברות -->
 <div id="main" class="screen">
-  <h2>מה תרצה לעשות?</h2>
-  <button onclick="showBorrow()">השאלת חפץ</button>
-  <button onclick="showDonate()">תרומת חפץ</button><br>
-  <button onclick="logout()">התנתק</button>
+  <div class="card">
+    <h2>מה תרצה לעשות?</h2>
+    <button onclick="showBorrow()">השאלת חפץ</button>
+    <button onclick="showDonate()">תרומת חפץ</button><br>
+    <button onclick="logout()">התנתק</button>
+  </div>
 </div>
 
-<!-- השאלת חפץ -->
 <div id="borrow" class="screen">
-  <h2>השאלת חפץ</h2>
-  <input type="text" placeholder="שם החפץ"><br>
-  <input type="text" placeholder="לכמה זמן?"><br>
-  <button onclick="backToMain()">חזור</button>
+  <div class="card">
+    <h2>השאלת חפץ</h2>
+    <input type="text" id="borrowItem" placeholder="שם החפץ"><br>
+    <input type="date" id="borrowDate"><br>
+    <button onclick="finishBorrow()">סיים השאלה</button><br>
+    <button onclick="backToMain()">חזור</button>
+    <div id="borrowMessage" class="message"></div>
+  </div>
 </div>
 
-<!-- תרומת חפץ -->
 <div id="donate" class="screen">
-  <h2>תרומת חפץ</h2>
-  <input type="text" placeholder="שם החפץ"><br>
-  <input type="file"><br>
-  <textarea placeholder="הערות"></textarea><br>
-  <button onclick="backToMain()">חזור</button>
+  <div class="card">
+    <h2>תרומת חפץ</h2>
+    <input type="text" id="donateItem" placeholder="שם החפץ"><br>
+    <input type="file"><br>
+    <textarea placeholder="הערות"></textarea><br>
+    <button onclick="finishDonate()">סיים תרומה</button><br>
+    <button onclick="backToMain()">חזור</button>
+    <div id="donateMessage" class="message"></div>
+  </div>
 </div>
 
 <script>
@@ -108,6 +150,8 @@ function showDonate() {
 function backToMain() {
   hideAll();
   document.getElementById("main").style.display = "block";
+  document.getElementById("borrowMessage").innerHTML = "";
+  document.getElementById("donateMessage").innerHTML = "";
 }
 
 function goHome() {
@@ -118,6 +162,27 @@ function goHome() {
 function logout() {
   hideAll();
   document.getElementById("home").style.display = "block";
+}
+
+function finishDonate() {
+  const item = document.getElementById("donateItem").value;
+  if(item === "") {
+    alert("תכניס שם חפץ");
+    return;
+  }
+  document.getElementById("donateMessage").innerHTML =
+    "🎉 תודה על תרומתך! תרמת את: " + item;
+}
+
+function finishBorrow() {
+  const item = document.getElementById("borrowItem").value;
+  const date = document.getElementById("borrowDate").value;
+  if(item === "" || date === "") {
+    alert("תמלא את כל השדות");
+    return;
+  }
+  document.getElementById("borrowMessage").innerHTML =
+    "✅ השאלת את " + item + " בתאריך " + date;
 }
 </script>
 
