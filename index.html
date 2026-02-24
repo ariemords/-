@@ -2,49 +2,24 @@
 <html lang="he">
 <head>
 <meta charset="UTF-8">
-<title>מערכת השאלת ותרומת חפצים</title>
+<title>השאלת ותרומת חפצים</title>
 
 <style>
 body {
   font-family: Arial;
+  margin: 0;
   text-align: center;
   background: linear-gradient(to right, #1e3c72, #2a5298);
   color: white;
-  margin: 0;
 }
 
 h1, h2 {
-  margin-top: 30px;
-}
-
-button {
-  padding: 15px 40px;
-  margin: 15px;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #00b4ff;
-  color: white;
-  transition: 0.3s;
-}
-
-button:hover {
-  background-color: #0088cc;
-  transform: scale(1.05);
-}
-
-input, textarea {
-  padding: 10px;
-  width: 250px;
-  margin: 8px;
-  border-radius: 6px;
-  border: none;
+  margin-top: 20px;
 }
 
 .screen {
   display: none;
-  margin-top: 60px;
+  margin-top: 40px;
 }
 
 #home {
@@ -52,15 +27,48 @@ input, textarea {
 }
 
 .card {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
   padding: 30px;
   border-radius: 15px;
   display: inline-block;
+  min-width: 300px;
 }
 
-.message {
-  margin-top: 20px;
+input, textarea {
+  width: 250px;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  padding: 15px 35px;
+  margin: 10px;
   font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  background: #00b4ff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0088cc;
+}
+
+.list {
+  margin-top: 20px;
+  text-align: right;
+}
+.item {
+  background: rgba(255,255,255,0.2);
+  padding: 10px;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+.message {
+  margin-top: 15px;
   font-weight: bold;
   color: #00ffcc;
 }
@@ -69,51 +77,63 @@ input, textarea {
 
 <body>
 
+<!-- מסך בית -->
 <div id="home" class="screen">
   <div class="card">
     <h1>ברוך הבא</h1>
-    <button onclick="showLogin()">התחברות</button>
+    <button onclick="goLogin()">התחברות</button>
   </div>
 </div>
 
+<!-- התחברות -->
 <div id="login" class="screen">
   <div class="card">
     <h2>התחברות</h2>
-    <input type="text" id="username" placeholder="שם משתמש"><br>
-    <button onclick="enterSite()">כניסה</button><br>
+    <input id="username" placeholder="שם משתמש">
+    <br>
+    <button onclick="login()">כניסה</button>
     <button onclick="goHome()">חזור</button>
   </div>
 </div>
 
+<!-- מסך ראשי -->
 <div id="main" class="screen">
   <div class="card">
-    <h2>מה תרצה לעשות?</h2>
+    <h2 id="hello"></h2>
     <button onclick="showBorrow()">השאלת חפץ</button>
-    <button onclick="showDonate()">תרומת חפץ</button><br>
+    <button onclick="showDonate()">תרומת חפץ</button>
     <button onclick="logout()">התנתק</button>
+  </div>
+
+  <div class="card list">
+    <h3>📦 רשימת חפצים</h3>
+    <div id="items"></div>
   </div>
 </div>
 
+<!-- השאלה -->
 <div id="borrow" class="screen">
   <div class="card">
     <h2>השאלת חפץ</h2>
-    <input type="text" id="borrowItem" placeholder="שם החפץ"><br>
-    <input type="date" id="borrowDate"><br>
-    <button onclick="finishBorrow()">סיים השאלה</button><br>
-    <button onclick="backToMain()">חזור</button>
-    <div id="borrowMessage" class="message"></div>
+    <input id="borrowName" placeholder="שם החפץ">
+    <input type="date" id="borrowDate">
+    <br>
+    <button onclick="saveBorrow()">סיום</button>
+    <button onclick="backMain()">חזור</button>
+    <div id="borrowMsg" class="message"></div>
   </div>
 </div>
 
+<!-- תרומה -->
 <div id="donate" class="screen">
   <div class="card">
     <h2>תרומת חפץ</h2>
-    <input type="text" id="donateItem" placeholder="שם החפץ"><br>
-    <input type="file"><br>
-    <textarea placeholder="הערות"></textarea><br>
-    <button onclick="finishDonate()">סיים תרומה</button><br>
-    <button onclick="backToMain()">חזור</button>
-    <div id="donateMessage" class="message"></div>
+    <input id="donateName" placeholder="שם החפץ">
+    <textarea id="donateNote" placeholder="הערות"></textarea>
+    <br>
+    <button onclick="saveDonate()">סיום</button>
+    <button onclick="backMain()">חזור</button>
+    <div id="donateMsg" class="message"></div>
   </div>
 </div>
 
@@ -122,69 +142,95 @@ function hideAll() {
   document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
 }
 
-function showLogin() {
+function goHome() {
   hideAll();
-  document.getElementById("login").style.display = "block";
+  home.style.display = "block";
 }
 
-function enterSite() {
-  const user = document.getElementById("username").value;
-  if (user === "") {
-    alert("תכניס שם משתמש");
-    return;
-  }
+function goLogin() {
   hideAll();
-  document.getElementById("main").style.display = "block";
+  login.style.display = "block";
+}
+
+function login() {
+  const name = username.value.trim();
+  if (!name) return alert("תכניס שם משתמש");
+  localStorage.setItem("user", name);
+  loadUser();
+}
+
+function loadUser() {
+  const user = localStorage.getItem("user");
+  if (!user) return goHome();
+  hideAll();
+  main.style.display = "block";
+  hello.innerText = "שלום " + user;
+  loadItems();
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  goHome();
 }
 
 function showBorrow() {
   hideAll();
-  document.getElementById("borrow").style.display = "block";
+  borrow.style.display = "block";
 }
 
 function showDonate() {
   hideAll();
-  document.getElementById("donate").style.display = "block";
+  donate.style.display = "block";
 }
 
-function backToMain() {
+function backMain() {
   hideAll();
-  document.getElementById("main").style.display = "block";
-  document.getElementById("borrowMessage").innerHTML = "";
-  document.getElementById("donateMessage").innerHTML = "";
+  main.style.display = "block";
 }
 
-function goHome() {
-  hideAll();
-  document.getElementById("home").style.display = "block";
+function getItems() {
+  return JSON.parse(localStorage.getItem("items") || "[]");
 }
 
-function logout() {
-  hideAll();
-  document.getElementById("home").style.display = "block";
+function saveItems(items) {
+  localStorage.setItem("items", JSON.stringify(items));
 }
 
-function finishDonate() {
-  const item = document.getElementById("donateItem").value;
-  if(item === "") {
-    alert("תכניס שם חפץ");
-    return;
-  }
-  document.getElementById("donateMessage").innerHTML =
-    "🎉 תודה על תרומתך! תרמת את: " + item;
+function saveBorrow() {
+  const name = borrowName.value;
+  const date = borrowDate.value;
+  if (!name || !date) return alert("מלא הכול");
+  const items = getItems();
+  items.push("השאלה: " + name + " בתאריך " + date);
+  saveItems(items);
+  borrowMsg.innerText = "השאלת את " + name + " בתאריך " + date;
+  loadItems();
 }
 
-function finishBorrow() {
-  const item = document.getElementById("borrowItem").value;
-  const date = document.getElementById("borrowDate").value;
-  if(item === "" || date === "") {
-    alert("תמלא את כל השדות");
-    return;
-  }
-  document.getElementById("borrowMessage").innerHTML =
-    "✅ השאלת את " + item + " בתאריך " + date;
+function saveDonate() {
+  const name = donateName.value;
+  if (!name) return alert("מלא שם חפץ");
+  const items = getItems();
+  items.push("תרומה: " + name);
+  saveItems(items);
+  donateMsg.innerText = "תודה על תרומתך!";
+  loadItems();
 }
+
+function loadItems() {
+  const itemsDiv = document.getElementById("items");
+  const items = getItems();
+  itemsDiv.innerHTML = "";
+  items.forEach(i => {
+    const d = document.createElement("div");
+    d.className = "item";
+    d.innerText = i;
+    itemsDiv.appendChild(d);
+  });
+}
+
+loadUser();
 </script>
-update design
+
 </body>
 </html>
